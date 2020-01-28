@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Spyder Editor
-
 This is a temporary script file.
 """
 
@@ -12,8 +11,10 @@ from bs4 import BeautifulSoup
 
 #Creating Function for getting max pages
 def get_max_pages(user_name):
-    '''Function for getting the maximum number of pages of games
-       from our user page'''
+    """
+    :params user_name: username
+    : return max_page_tag: max numer of pages for user
+    """
     
     #Setting parameters and getting soup for our user
     url = "https://www.nintendolife.com/users/" + user_name + "/games"
@@ -36,8 +37,11 @@ def get_max_pages(user_name):
     
 #Creating Function for getting games and ratings into dataframe=
 def games_ratings_to_df(user_name, max_pages):
-    '''Function for putting a user's games
-    and ratings into a dataframe'''
+    """
+    :params user_name: user_name
+    :params max_pages: max_pages from function get_max_pages()
+    : return df: scraped pandas dataframe for user_name
+    """
     
     #Setting up object holders
     cols = ["User", "Game", "Rating"]
