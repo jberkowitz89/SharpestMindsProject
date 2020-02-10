@@ -141,7 +141,7 @@ def get_max_pages_thread(thread_name):
 def get_users(thread_name, max_pages):
     '''Function for collecting all users from a thread. 
     Params: thread name (string), max number of pages
-    returns :De-duplicated list of users'''
+    : returns deduped_users: De-duplicated list of users'''
     
     users = []
     for i in range(max_pages):
@@ -173,3 +173,132 @@ def get_users(thread_name, max_pages):
     #Deduplicating List
     deduped_users = list(set(users))
     return deduped_users
+
+#Function for getting max pages from the games page
+def get_max_pages_gamepage(url):
+    """
+    Function for getting max number of pages from a game page
+    :params url: url for games page
+    : returns max_page_tag: max numer of pages for games page
+    """
+
+    r = requests.get(url) 
+    html_text = r.text
+    soup = BeautifulSoup(html_text, "html.parser")
+
+    #first pass
+    pagination_tags = soup.findAll("a", {"class": "accent accent-bg-hover accent-border"}) #just pagination tags
+    page_tag_numbers = [1]
+    for tag in pagination_tags:
+        page_tag_numbers.append(int(tag.contents[0]))
+    max_page_tag = max(page_tag_numbers)
+
+    #Every pass therafter
+    empty_checker = []
+    while not empty_checker:
+        new_url = url + "&page=" + str(max_page_tag)
+        r = requests.get(new_url) 
+        html_text = r.text
+        soup = BeautifulSoup(html_text, "html.parser")
+
+        pagination_tags = soup.findAll("a", {"class": "accent accent-bg-hover accent-border"})
+        empty_checker = soup.findAll("li", {"class": "empty"})
+
+        for tag in pagination_tags:
+            if int(tag.contents[0]) not in page_tag_numbers:
+                page_tag_numbers.append(int(tag.contents[0]))
+        max_page_tag = max(page_tag_numbers)
+    
+    return max_page_tag
+
+#Function for getting URLs for each game
+def get_game_urls(url, max_pages):
+    '''Function for getting list of game urls from games page on Nintendolife.com
+    params: url: URL of games page - can be filtered for specific system
+    params: max_pages: maximum number of pages for games page
+    : returns: list of urls for each game
+    '''
+    game_urls = []
+
+    for page in range(1, max_pages+1):
+        if page == 1:
+            url = url
+            r = requests.get(url) 
+            html_text = r.text
+            soup = BeautifulSoup(html_text, "html.parser")
+    
+            #Getting Game Tags
+            game_tags = soup.findAll("a", {"class": "title accent-hover"})
+            for game in game_tags:
+                game_link = game.attrs["href"]
+                if game_link[0:5] == "games":
+                    game_urls.append(game_link)
+                else:
+                    pass
+        else:
+            url = url + "&page=" + str(page) 
+            r = requests.get(url) 
+            html_text = r.text
+            soup = BeautifulSoup(html_text, "html.parser")
+    
+            #Getting Game Tags
+            game_tags = soup.findAll("a", {"class": "title accent-hover"})
+            for game in game_tags:
+                game_link = game.attrs["href"]
+                if game_link[0:5] == "games":
+                    game_urls.append(game_link)
+                else:
+                    pass
+    return game_urls
+
+def get_game_metadata(games_list):
+    '''Function for getting metadata for games.
+    :params game_list: list of game urls
+    : returns: dataframe with game metadata
+    '''
+    #List for appending game metadata
+    game_metadata = []
+
+    for game in games_list:
+        url = "http://www.nintendolife.com/" + game
+        r = requests.get(url)
+        html_text = r.text
+        soup = BeautifulSoup(html_text, "html.parser")
+
+        #Getting Game Name
+        game_tags = soup.findAll("h1")
+        for tag in game_tags:
+            game_title = tag.contents[0].contents[0]
+
+        #Gets us platform, developer, publisher, number of players
+        info = soup.findAll("dd", {"class": "first"})
+        info_list=[]
+        for tag in info:
+            if len(tag.contents) == 1:
+                info_list.append(tag.contents[0])
+        try:
+            platform = info_list[0]
+            developer = info_list[1]
+            publisher = info_list[2]
+        except:
+            publisher = "N/A"
+
+        #Getting genre
+        genre_tags = soup.findAll("a")
+        genre_list = []
+        for element in genre_tags:
+            if "genre" in element.attrs["href"]:
+                genre_list.append(element.contents[0])
+
+        keys = ["game_title", "platform", "developer", "publisher", "genre"]
+        values = [game_title, platform, developer, publisher, genre_list]
+
+        game_dict = dict(zip(keys, values))
+        game_metadata.append(game_dict)
+        
+        if len(game_metadata) % 50 == 0:
+            print(len(game_metadata))
+        
+    df = pd.DataFrame(game_metadata)
+    return df
+
