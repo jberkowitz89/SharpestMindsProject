@@ -1,7 +1,7 @@
-import os
-import sys
 import pandas as pd
 import time
+import os
+import sys
 
 start_time = time.time()
 
@@ -11,15 +11,22 @@ sys.path.append(os.getcwd())
 
 import Nintendo.src.NintendoLife_Scraping as Nintendo
 
-thread_pages = Nintendo.get_max_pages_thread("friend_exchange_-_share_friend_codes_for_switch_multiplayer_matches")
-thread_users = Nintendo.get_users("friend_exchange_-_share_friend_codes_for_switch_multiplayer_matches", thread_pages)
+thread_name = "the_switch_eshop_recommendations"
+
+thread_pages = Nintendo.get_max_pages_thread(thread_name)
+thread_users = Nintendo.get_users(thread_name, thread_pages)
 
 df = pd.DataFrame()
+games_urls = []
 
 for user in thread_users:
     max_pages = Nintendo.get_max_pages(user)
-    user_games_ratings = Nintendo.games_ratings_to_df(user, max_pages)
+    user_games_ratings, urls = Nintendo.games_ratings_to_df(user, max_pages)
     df = df.append(user_games_ratings)
+    games_urls.extend(urls)
+    
+games_urls = list(set(games_urls))
+games_meta = Nintendo.get_game_metadata(games_urls)
     
 print("--- %s seconds ---" % (time.time() - start_time))
 

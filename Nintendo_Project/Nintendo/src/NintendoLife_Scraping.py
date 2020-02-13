@@ -41,6 +41,7 @@ def games_ratings_to_df(user_name, max_pages):
     :params user_name: user_name
     :params max_pages: max_pages from function get_max_pages()
     : return df: scraped pandas dataframe for user_name
+    : return game_urls: list of urls for games listed on user page
     """
     
     #Setting up object holders
@@ -48,6 +49,7 @@ def games_ratings_to_df(user_name, max_pages):
     df = pd.DataFrame(columns=cols)
     games = []
     ratings = []
+    game_urls = []
     
     #iterating through pages
     for page in range(1, max_pages+1):
@@ -74,6 +76,15 @@ def games_ratings_to_df(user_name, max_pages):
                             ratings.append("No Score")
                 except KeyError:
                     pass
+            
+            #Getting game urls
+            hrefs = soup.findAll("a", {"class": "title accent-hover"})
+            try:
+                for i in range(len(hrefs)):
+                    url = hrefs[i].attrs["href"]
+                    game_urls.append(url)
+            except:
+                pass
             #appending no score for last game (if last game had no score)
             if len(games) > len(ratings):
                 ratings.append("No Score")
@@ -100,6 +111,13 @@ def games_ratings_to_df(user_name, max_pages):
                             ratings.append("No Score")
                 except KeyError:
                     pass
+                
+            #Getting game urls
+            hrefs = soup.findAll("a", {"class": "title accent-hover"})
+            for i in range(len(hrefs)):
+                url = hrefs[i].attrs["href"]
+                game_urls.append(url)
+                
             #appending no score for last game (if last game had no score)
             if len(games) > len(ratings):
                 ratings.append("No Score")
@@ -109,7 +127,9 @@ def games_ratings_to_df(user_name, max_pages):
     df["Rating"] = ratings
     df["User"] = user_name
     
-    return df
+    game_urls = list(set(game_urls))
+    
+    return df, game_urls
 
 #Function for getting the max number of pages for a thread
 def get_max_pages_thread(thread_name):
@@ -174,82 +194,6 @@ def get_users(thread_name, max_pages):
     deduped_users = list(set(users))
     return deduped_users
 
-#Function for getting max pages from the games page
-def get_max_pages_gamepage(url):
-    """
-    Function for getting max number of pages from a game page
-    :params url: url for games page
-    : returns max_page_tag: max numer of pages for games page
-    """
-
-    r = requests.get(url) 
-    html_text = r.text
-    soup = BeautifulSoup(html_text, "html.parser")
-
-    #first pass
-    pagination_tags = soup.findAll("a", {"class": "accent accent-bg-hover accent-border"}) #just pagination tags
-    page_tag_numbers = [1]
-    for tag in pagination_tags:
-        page_tag_numbers.append(int(tag.contents[0]))
-    max_page_tag = max(page_tag_numbers)
-
-    #Every pass therafter
-    empty_checker = []
-    while not empty_checker:
-        new_url = url + "&page=" + str(max_page_tag)
-        r = requests.get(new_url) 
-        html_text = r.text
-        soup = BeautifulSoup(html_text, "html.parser")
-
-        pagination_tags = soup.findAll("a", {"class": "accent accent-bg-hover accent-border"})
-        empty_checker = soup.findAll("li", {"class": "empty"})
-
-        for tag in pagination_tags:
-            if int(tag.contents[0]) not in page_tag_numbers:
-                page_tag_numbers.append(int(tag.contents[0]))
-        max_page_tag = max(page_tag_numbers)
-    
-    return max_page_tag
-
-#Function for getting URLs for each game
-def get_game_urls(url, max_pages):
-    '''Function for getting list of game urls from games page on Nintendolife.com
-    params: url: URL of games page - can be filtered for specific system
-    params: max_pages: maximum number of pages for games page
-    : returns: list of urls for each game
-    '''
-    game_urls = []
-
-    for page in range(1, max_pages+1):
-        if page == 1:
-            url = url
-            r = requests.get(url) 
-            html_text = r.text
-            soup = BeautifulSoup(html_text, "html.parser")
-    
-            #Getting Game Tags
-            game_tags = soup.findAll("a", {"class": "title accent-hover"})
-            for game in game_tags:
-                game_link = game.attrs["href"]
-                if game_link[0:5] == "games":
-                    game_urls.append(game_link)
-                else:
-                    pass
-        else:
-            url = url + "&page=" + str(page) 
-            r = requests.get(url) 
-            html_text = r.text
-            soup = BeautifulSoup(html_text, "html.parser")
-    
-            #Getting Game Tags
-            game_tags = soup.findAll("a", {"class": "title accent-hover"})
-            for game in game_tags:
-                game_link = game.attrs["href"]
-                if game_link[0:5] == "games":
-                    game_urls.append(game_link)
-                else:
-                    pass
-    return game_urls
 
 def get_game_metadata(games_list):
     '''Function for getting metadata for games.
@@ -268,8 +212,10 @@ def get_game_metadata(games_list):
         #Getting Game Name
         game_tags = soup.findAll("h1")
         for tag in game_tags:
-            game_title = tag.contents[0].contents[0]
-
+            try:
+                game_title = tag.contents[0].contents[0]
+            except:
+                pass
         #Gets us platform, developer, publisher, number of players
         info = soup.findAll("dd", {"class": "first"})
         info_list=[]
@@ -296,7 +242,7 @@ def get_game_metadata(games_list):
         game_dict = dict(zip(keys, values))
         game_metadata.append(game_dict)
         
-        if len(game_metadata) % 50 == 0:
+        if len(game_metadata) % 100 == 0:
             print(len(game_metadata))
         
     df = pd.DataFrame(game_metadata)
