@@ -235,9 +235,27 @@ def get_game_metadata(games_list):
         for element in genre_tags:
             if "genre" in element.attrs["href"]:
                 genre_list.append(element.contents[0])
-
-        keys = ["game_title", "platform", "developer", "publisher", "genre"]
-        values = [game_title, platform, developer, publisher, genre_list]
+                
+        #Getting Release Date
+        date_and_price = []
+        details_tags = soup.findAll("li", {"class":"first"})
+        for tag in details_tags:
+            if len(tag) > 1: 
+                datestr = str(tag.contents[0])
+                if "<" not in datestr:
+                    datestr = datestr.strip("(")
+                    datestr = datestr.strip(" ")
+                    date_and_price.append(datestr)
+                pricestr = str(tag.contents[2])
+                if "<" not in pricestr:
+                    pricestr = pricestr.strip("), ")
+                    date_and_price.append(pricestr)
+        
+        date = date_and_price[0]
+        price = date_and_price[1]
+                
+        keys = ["game_title", "platform", "developer", "publisher", "genre", "release_date", "price"]
+        values = [game_title, platform, developer, publisher, genre_list, date, price]
 
         game_dict = dict(zip(keys, values))
         game_metadata.append(game_dict)
