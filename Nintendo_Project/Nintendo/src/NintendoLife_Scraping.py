@@ -47,7 +47,7 @@ def games_ratings_to_df(user_name, max_pages):
     """
     
     #Setting up object holders
-    cols = ["User", "Game", "Rating"]
+    cols = ["user", "game", "rating"]
     df = pd.DataFrame(columns=cols)
     games = []
     ratings = []
@@ -127,9 +127,9 @@ def games_ratings_to_df(user_name, max_pages):
                     ratings.append("No Score")
     
     #Adding our games and ratings list to dataframe
-    df["Game"] = games
-    df["Rating"] = ratings
-    df["User"] = user_name
+    df["game"] = games
+    df["rating"] = ratings
+    df["user"] = user_name
     
     games_and_urls = list(zip(games, game_urls))
     

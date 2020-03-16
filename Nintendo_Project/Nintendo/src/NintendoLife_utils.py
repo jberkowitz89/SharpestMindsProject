@@ -41,13 +41,13 @@ def create_raw_data_and_game_urls(threads):
             games_and_urls.extend(urls)
             print("dataframe length: ", len(raw_df))
 
-    raw_df = raw_df.assign(Game_ID=(raw_df['Game']).astype('category').cat.codes)
-    raw_df = raw_df.assign(User_ID=(raw_df['User']).astype('category').cat.codes)
-    raw_df["Timestamp"] = dt.datetime.now()
-    raw_df["Record_ID"] = raw_df["User_ID"].astype(str) + "_" + raw_df["Game_ID"].astype(str) + "_" + raw_df["Timestamp"].dt.date.astype(str)
+    raw_df = raw_df.assign(game_id=(raw_df['game']).astype('category').cat.codes)
+    raw_df = raw_df.assign(user_id=(raw_df['user']).astype('category').cat.codes)
+    raw_df["run_time"] = dt.datetime.now()
+    raw_df["record_id"] = raw_df["user_id"].astype(str) + "_" + raw_df["game_id"].astype(str) + "_" + raw_df["run_time"].dt.date.astype(str)
     scraper_run = str(np.random.randint(1,100000000))
-    raw_df["Scraper_Run"] = scraper_run
-    games_urls_ids = [game_url + (game_id,) for game_url, game_id in zip(games_and_urls, raw_df["Game_ID"])]
+    raw_df["scraper_run"] = scraper_run
+    games_urls_ids = [game_url + (game_id,) for game_url, game_id in zip(games_and_urls, raw_df["game_id"])]
     raw_df.reset_index(drop=True, inplace=True)
     
     
@@ -100,7 +100,7 @@ def fill_no_score(df, rating_column, user_column):
             else:
                 df.loc[index, rating_column] = ovr_median
     
-    df["Timestamp"] = dt.datetime.now()
+    df["run_time"] = dt.datetime.now()
     return df
 
 def create_surprise_dataset(df, user_col, item_col, rating_col, rating_scale):
@@ -114,27 +114,31 @@ def create_surprise_dataset(df, user_col, item_col, rating_col, rating_scale):
     surprise_data = Dataset.load_from_df(df[[user_col, item_col, rating_col]], reader)
     return surprise_data
 
-def run_grid_search(surprise_data, algo, param_grid, scraper_run):
+def run_grid_search(surprise_data, model, param_grid, scraper_run):
     '''
     Function for running GridSearchCV algorithm tuning. 
     params: surprise_data (surprise dataset), algo (surprise recommender algorithm), 
     param_grid (dictionary, tuning parameters), scraper_run (string)
     :returns gs_results (dataframe), gs_run (string), best_params (dictionary)
     '''
-    gs = GridSearchCV(algo, param_grid, measures=["rmse"], cv=3)
+    if model == "SVD":
+        gs = GridSearchCV(SVD, param_grid, measures=["rmse"], cv=3)
 
-    gs.fit(surprise_data)
-
-    gs_results = pd.DataFrame(gs.cv_results)
+        gs.fit(surprise_data)
     
-    gs_results["Timestamp"] = dt.datetime.now()
-    gs_results["algo"] = gs.algo_class
-    gs_run = str(np.random.randint(1,100000000))
-    gs_results["gs_run"] = gs_run
-    gs_results["scraper_run"] = scraper_run
-    best_params = gs.best_params["rmse"]
-    gs_results['params'] = gs_results['params'].astype(str)
-    gs_results['algo'] = gs_results['algo'].astype(str)
+        gs_results = pd.DataFrame(gs.cv_results)
+        
+        gs_results["run_time"] = dt.datetime.now()
+        gs_results["algo"] = gs.algo_class
+        gs_run = str(np.random.randint(1,100000000))
+        gs_results["gs_run"] = gs_run
+        gs_results["scraper_run"] = scraper_run
+        best_params = gs.best_params["rmse"]
+        gs_results['params'] = gs_results['params'].astype(str)
+        gs_results['algo'] = gs_results['algo'].astype(str)
+    
+    else:
+        print("No Model, Stop")
     
     return gs_results, gs_run, best_params
 
@@ -149,17 +153,19 @@ def create_train_and_test(surprise_data, test_size):
     return trainset, testset
 
 #Function for running simple implementation of SVD
-def run_svd(trainset, testset, best_params):
+def run_model(model, trainset, testset, best_params):
     '''
     Function for running surprise's SVD algorithm
     params: trainset (surprise trainset), testset (surprise testset), best_params (dict)
     :returns predictions (defaultdict), test_rmse (float)
     '''
-    algo = SVD(n_factors = best_params["n_factors"], n_epochs=best_params["n_epochs"], 
-               lr_all = best_params["lr_all"], reg_all = best_params["reg_all"])
-    svd_fit = algo.fit(trainset)
-    predictions = svd_fit.test(testset)
-    test_rmse = accuracy.rmse(predictions)
+    if model == "SVD":
+        algo = SVD(n_factors = best_params["n_factors"], n_epochs=best_params["n_epochs"], 
+                   lr_all = best_params["lr_all"], reg_all = best_params["reg_all"])
+        svd_fit = algo.fit(trainset)
+        predictions = svd_fit.test(testset)
+        test_rmse = accuracy.rmse(predictions)
+     
     return predictions, test_rmse
 
     
@@ -171,7 +177,7 @@ def create_preds_df(predictions, gs_results, gs_run):
     '''
     df = pd.DataFrame(predictions, columns=['uid', 'iid', 'rui', 'est', 'details'])
     df['err'] = abs(df.est - df.rui)
-    df["Timestamp"] = dt.datetime.now()
+    df["run_time"] = dt.datetime.now()
     df["gs_id"] = gs_results[(gs_results["gs_run"] == gs_run) & (gs_results["rank_test_rmse"] == 1)].index[0]
     pred_run = str(np.random.randint(1,100000000))
     df["pred_run"] = pred_run

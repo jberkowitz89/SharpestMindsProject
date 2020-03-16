@@ -1,0 +1,19 @@
+{
+	"model": "SVD",
+
+	"threads": ["the_multiplayer_match_organisation_thread", 
+			"friend_exchange_-_share_friend_codes_for_switch_multiplayer_matches", 
+			"the_multiplayer_match_organisation_thread", 
+			"next_nintendo_direct", "nintendo_switch_game_file_sizes", 
+			"the_switch_eshop_recommendations"],
+
+
+	"param_grid": {
+		"n_factors": [20, 50, 100, 150], "n_epochs": [20, 30, 50],
+	              "lr_all": [0.002, 0.005, 0.007, 0.01], "reg_all": [0.02, 0.05, 0.1]
+	},
+
+	"sql_engine": "postgresql+psycopg2://josephberkowitz:@localhost:5432/nintendo"
+
+
+}
