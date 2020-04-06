@@ -19,14 +19,14 @@ def get_top_10(username):
     Params: username (string)
     returns: list of items (list)
     '''
-    query = text('''SELECT iid FROM predictions WHERE uid = :name AND 
-                 run_time = (SELECT max(run_time) FROM predictions) ORDER BY est DESC LIMIT 10;''')
-    results = conn.execute(query, name=username).fetchall()
+    query = text('''SELECT game FROM recommendations WHERE username = :username AND 
+                 run_time = (SELECT max(run_time) FROM recommendations) ORDER BY predicted_rating DESC LIMIT 10;''')
+    results = conn.execute(query, username=username).fetchall()
     return results
 
-link3710_results = get_top_10('link3710')
+silentium_results = get_top_10('silentium')
 
-print("Top 10 Results for link3710")
-for item, in link3710_results:
+print("Top 10 Results for silentium")
+for item, in silentium_results:
     print(item)
     
