@@ -5,17 +5,13 @@ Created on Thu Apr  2 17:41:52 2020
 
 @author: josephberkowitz
 """
-
 #Importing necessary modules
 from sqlalchemy import create_engine
 import datetime as dt
 import pandas as pd
 
 #Importing custom modules
-import create_data
-import clean_data
-import modeling
-import evaluation
+from Nintendo.src import create_data, clean_data, modeling, evaluation
 
 def run_scraper(threads, sql_engine):
     '''Wrapper Function for running the scraper portion of my recommender system.
@@ -78,6 +74,11 @@ def recommend(cleaned_df, model, param_grid, scraper_run, engine):
     
     #Filling Interactions df
     interactions, known_items = modeling.fill_interaction_matrix(interactions, full_train, user_dict, item_dict, svd_fit)
+    
+    #Creating known items dataframe
+    known_items_df = modeling.create_known_items_df(known_items, scraper_run)
+    known_items_df.to_sql('known_items', con=engine, if_exists="append")
+    print('known items loaded to sql')
     
     #Creating recommendations dict
     recommendations = modeling.create_recommendations_dict(interactions, known_items, n=10)

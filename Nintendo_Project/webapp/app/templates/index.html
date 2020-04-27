@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <title>{{ title }} - Nintendo Recommender System</title>
+    </head>
+    <body>
+        <h1>User Profile for {{ user.username }}</h1>
+        
+        <h1>{{user.username}} has rated the following items:</h1>
+        	{% for rated_game in rated_games %}
+        	<p> {{rated_game}} </p>
+        	{% endfor %}
+
+        <h1>We recommend the following games for {{user.username}}:</h1>
+        	{% for rec in recommendations %}
+        	<p> {{rec}} </p>
+        	{% endfor %}
+    </body>
+</html>

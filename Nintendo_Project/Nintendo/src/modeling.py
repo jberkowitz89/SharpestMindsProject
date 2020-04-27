@@ -161,6 +161,17 @@ def fill_interaction_matrix(interactions, train, user_dict, item_dict, model):
     
     return interactions, known_items
 
+def create_known_items_df(known_items, scraper_run):
+    df_lst = []
+    for user in known_items.keys():
+        for item in known_items[user]:
+            row_lst = [user, item]
+            df_lst.append(row_lst)
+    known_items_df = pd.DataFrame(df_lst, columns=['username', 'game'])
+    known_items_df['scraper_run'] = scraper_run
+    known_items_df['run_time'] = dt.datetime.now()
+    return known_items_df
+
 def create_recommendations_dict(interactions, known_items, n=10):
     '''
     Function for creating a dictionary from interaction matrix dataframe.
