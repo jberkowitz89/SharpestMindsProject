@@ -8,10 +8,18 @@ As you can see, while there are ways to find featured games, recent releases, be
 I believe that adding game recommendations to the Switch eShop can help Switch owners find more to play.
 
 ## Data Collection
-As Nintendo themselves doesn't offer any data around users and their gaming habits, I looked to NintendoLife.com, a popular Nintendo fan website, to find data to build my recommender system. NintendoLife's site offers Nintendo news, game reviews, opinion articles, as well as the ability for users to rate games, create a profile displaying their game collection, and interact with other users on forums. 
+As Nintendo themselves doesn't offer any data around users and their gaming habits, I looked to NintendoLife.com, a popular Nintendo fan website, to find data to build my recommender system. NintendoLife's site offers Nintendo news, game reviews, opinion articles, as well as the ability for users to rate games, create a profile displaying their game collection, and interact with other users on forums. To scrape data from NintendoLife.com, I used Python's BeautifulSoup library.
 To begin the data collection process, we start by scraping NintendoLife's forums for usernames. The forums contain thousands of posts from different users:
 ![](images/nintendolife_forum2.png)
+
 Once users are collected, we scrape games and ratings from each user's page. An example of a user page is shown here:
+
 ![](images/nintendolife_user.png)
 This scraping process provides us with a robust dataset of users, games and ratings, which we can use to train our recommender system model. We also collect metadata about each game, including the game's genre, price, developer and release date. Game metadata may be used in a future implementation of the recommender system model that includes features about our content (in this case, games).
 
+All that is necessary to begin the scraping process is a list of thread names from NintendoLife.com. These can be changed within our configuration and need to be set at the beginning of our recommendation process. 
+
+## Modeling
+I utilized the Surprise library in Python to train my recommender system module. Specifically, I use Surprise's implementation of the famous SVD algorithm. This algorithm decomposes a sparse user-item-rating matrix into a number of latent item and user factors, and then uses baseline ratings, regularization terms, and the dot product between the latent factors to run SGD and eventually predict missing ratings with the lowest possible training loss. 
+I tuned the model with Surprise's GridSearchCV function, using number of latent factors, number of training epochs (for SGD), learning rate and regularization term as tuning parameters. 
+Once our model is tuned, I create a sparse user-item-matrix based on our scraped data. 
