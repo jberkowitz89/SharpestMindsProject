@@ -10,5 +10,5 @@ I believe that adding game recommendations to the Switch eShop can help Switch o
 ## Data Collection
 As Nintendo themselves doesn't offer any data around users and their gaming habits, I looked to NintendoLife.com, a popular Nintendo fan website, to find data to build my recommender system. NintendoLife's site offers Nintendo news, game reviews, opinion articles, as well as the ability for users to rate games, create a profile displaying their game collection, and interact with other users on forums. 
 To begin the data collection process, I start by scraping NintendoLife's forums for usernames. The forums contain thousands of posts from different users:
-![] (images/nintendolife_forum2.png)
+![](images/nintendolife_forum2.png)
 
