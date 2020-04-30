@@ -22,4 +22,18 @@ All that is necessary to begin the scraping process is a list of thread names fr
 ## Modeling
 I utilized the Surprise library in Python to train my recommender system module. Specifically, I use Surprise's implementation of the famous SVD algorithm. This algorithm decomposes a sparse user-item-rating matrix into a number of latent item and user factors, and then uses baseline ratings, regularization terms, and the dot product between the latent factors to run SGD and eventually predict missing ratings with the lowest possible training loss. 
 I tuned the model with Surprise's GridSearchCV function, using number of latent factors, number of training epochs (for SGD), learning rate and regularization term as tuning parameters. 
-Once our model is tuned, I create a sparse user-item-matrix based on our scraped data. 
+Once our model is tuned, I create a sparse user-item-rating matrix based on our scraped data. An example of a sparse user-item-rating matrix is seen here:
+![](images/sparse_matrix.png)
+We then use our trained SVD model to predict a rating for each unrated game in our sparse user-item-rating matrix. 
+
+## Evaluation
+Once the sparse matrix is filled in, I'm able to sort the predicted ratings for each user's unrated games from highest to lowest, and create a list of top n recommendations for each user based on the predicted ratings. 
+I evaluated my model by the following metrics: RMSE, MAP@K (mean average precision @ K), MAR@K (mean average recall @ K), coverage score and personalization %. While RMSE, MAP@K and MAR@K are evaluated in a typical machine learning training/testing methodology, we can evaluate coverage score and personalization % based on recommendations.
+Coverage score is defined as the % of unique items that our recommender system recommends divided by the total number of unique items in our dataset. Personalization score is a measure of how similar each user's recommendations are to one another, with regard to each recommendation. For my most recent model run, evaluation metrics were as follows:
+* RMSE: 1.02
+* MAP@K: 0.86
+* MAR@K: 0.81
+* Coverage: 9.38%
+* Personalization: 52.1%
+
+##
