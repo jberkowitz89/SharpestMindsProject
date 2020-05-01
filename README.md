@@ -12,10 +12,10 @@ As Nintendo themselves doesn't offer any data around users and their gaming habi
 To begin the data collection process, we start by scraping NintendoLife's forums for usernames. The forums contain thousands of posts from different users:
 ![](images/nintendolife_forum2.png)
 
-Once users are collected, we scrape games and ratings from each user's page. An example of a user page is shown here:
+Once users are collected, I scrape games and ratings from each user's page. An example of a user page is shown here:
 
 ![](images/nintendolife_user.png)
-This scraping process provides us with a robust dataset of users, games and ratings, which we can use to train our recommender system model. We also collect metadata about each game, including the game's genre, price, developer and release date. Game metadata may be used in a future implementation of the recommender system model that includes features about our content (in this case, games).
+This scraping process provides us with a robust dataset of users, games and ratings, which I use to train our recommender system model. I also collect metadata about each game, including the game's genre, price, developer and release date. Game metadata may be used in a future implementation of the recommender system model that includes features about our content (in this case, games).
 
 All that is necessary to begin the scraping process is a list of thread names from NintendoLife.com. These can be changed within our configuration and need to be set at the beginning of our recommendation process. 
 
@@ -24,7 +24,7 @@ I utilized the Surprise library in Python to train my recommender system module.
 I tuned the model with Surprise's GridSearchCV function, using number of latent factors, number of training epochs (for SGD), learning rate and regularization term as tuning parameters. 
 Once our model is tuned, I create a sparse user-item-rating matrix based on our scraped data. An example of a sparse user-item-rating matrix is seen here:
 ![](images/sparse_matrix.png)
-We then use our trained SVD model to predict a rating for each unrated game in our sparse user-item-rating matrix. 
+I then use our trained SVD model to predict a rating for each unrated game in our sparse user-item-rating matrix. 
 
 ## Evaluation
 Once the sparse matrix is filled in, I'm able to sort the predicted ratings for each user's unrated games from highest to lowest, and create a list of top n recommendations for each user based on the predicted ratings. 
@@ -36,4 +36,9 @@ Coverage score is defined as the % of unique items that our recommender system r
 * Coverage: 9.38%
 * Personalization: 52.1%
 
-##
+## Database
+I created a postgresql database to store the results of my scraper, modeling, recommendations and evaluation. The database schema is laid out here:
+![](images/schema.png)
+
+## Web App
+I also created a 
