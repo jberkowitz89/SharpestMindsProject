@@ -41,7 +41,7 @@ I created a postgresql database to store the results of my scraper, modeling, re
 ![](images/schema.png)
 
 ## Web App
-I also created a basic flask app to display recommendations results. The current locally hosted app can be seen here:
+I also created a basic flask app to display recommendations results. A screenshot of the locally hosted app can be seen here:
 ![](images/webapp_ui.png)
 
 ##Future Considerations
