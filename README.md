@@ -17,7 +17,7 @@ Once users are collected, I scrape games and ratings from each user's page. An e
 ![](images/nintendolife_user.png)
 This scraping process provides us with a robust dataset of users, games and ratings, which I use to train our recommender system model. I also collect metadata about each game, including the game's genre, price, developer and release date. Game metadata may be used in a future implementation of the recommender system model that includes features about our content (in this case, games).
 
-All that is necessary to begin the scraping process is a list of thread names from NintendoLife.com. These can be changed within our configuration and need to be set at the beginning of our recommendation process. 
+All that is necessary to begin the scraping process is a list of thread names from NintendoLife.com. These can be changed within our configuration and need to be set at the beginning of the scraping and recommendation process. 
 
 ## Modeling
 I utilized the Surprise library in Python to train my recommender system module. Specifically, I use Surprise's implementation of the famous SVD algorithm. This algorithm decomposes a sparse user-item-rating matrix into a number of latent item and user factors, and then uses baseline ratings, regularization terms, and the dot product between the latent factors to run SGD and eventually predict missing ratings with the lowest possible training loss. 
