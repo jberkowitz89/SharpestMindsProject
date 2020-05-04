@@ -44,5 +44,5 @@ I created a postgresql database to store the results of my scraper, modeling, re
 I also created a basic flask app to display recommendations results. A screenshot of the locally hosted app can be seen here:
 ![](images/webapp_ui.png)
 
-##Future Considerations
+## Future Updates
 In future updates, I plan to add in more content featues to my model to potentially add more information to my recommender system model. I also want to make the front end more visually appealing and make it a true user-facing application.
