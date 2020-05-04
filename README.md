@@ -4,7 +4,7 @@ In this project, I used Python to build an end-to-end recommender system for Nin
 
 With over 2300 games available to download on the current Nintendo Switch eShop, finding a new game to download and play can be overwhelming. While the eShop does have a few easy methods for finding new games, unless you are searching for something specific, it may be difficult for some to find games to play in the current iteration of the eShop. The current eShop home page layout is depicted below:
 ![](images/eshop_home.png)
-As you can see, while there are ways to find featured games, recent releases, best sellers and games on sale, the eShop page is very generic. There are no elements of personalization recommendation besides what is popular, new or on sale. 
+As you can see, while there are ways to find featured games, recent releases, best sellers and games on sale, the eShop homepage is very generic. There are no elements of personalization recommendation besides what is popular, new or on sale. 
 I believe that adding game recommendations to the Switch eShop can help Switch owners find more to play.
 
 ## Data Collection
