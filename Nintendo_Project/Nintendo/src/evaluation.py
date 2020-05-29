@@ -107,7 +107,7 @@ def get_coverage_score(predicted_items, trainset_items):
     params: predicted_items (predicted item list), trainset_items (full)
     :returns cov (float)
     '''
-    cov = recmetrics.coverage(predicted=predicted_items, catalog=trainset_items)
+    cov = recmetrics.prediction_coverage(predicted=predicted_items, catalog=trainset_items)
     return cov
 
 #Function for getting personalization score

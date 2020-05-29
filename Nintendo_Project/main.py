@@ -6,7 +6,9 @@ Created on Sat Apr  4 14:43:51 2020
 @author: josephberkowitz
 """
 import json
+print(1)
 import Nintendo.src.wrapper as wrapper
+#from Nintendo.src import wrapper
 
 with open("config.JSON") as config_file:
     data = json.load(config_file)
@@ -30,5 +32,3 @@ cleaned_df = wrapper.clean_df(raw_df, sql_engine)
 
 evaluation_df = wrapper.evaluate(recommendations, predictions, full_train, 
                                  testset, test_rmse, recos_run, sql_engine)
-
-print(1)

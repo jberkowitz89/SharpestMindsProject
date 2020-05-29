@@ -10,7 +10,7 @@ Created on Sat Apr  4 15:46:54 2020
 import pandas as pd
 import datetime as dt
 import numpy as np
-
+#import scraper
 from Nintendo.src import scraper
 
 def create_raw_data_and_game_urls(threads):
