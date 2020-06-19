@@ -7,7 +7,11 @@ Created on Mon Apr 20 07:38:18 2020
 """
 
 from flask import Flask
+from flask_bootstrap import Bootstrap
+from config import Config
 
 app = Flask(__name__)
+app.config.from_object(Config)
+bootstrap = Bootstrap(app)
 
-from app import retrieve
+from app import routes
