@@ -1,3 +1,5 @@
+from app import db
+
 class Clean_Data(db.Model):
     __tablename__ = 'cleaned_data'
     index = db.Column(db.Integer, primary_key=True)

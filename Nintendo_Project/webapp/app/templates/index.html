@@ -1,15 +1,12 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
-{% block content %}
-    <h1>User Profile for {{ user.username }}</h1>
-
-    <h1>{{user.username}} has rated the following items:</h1>
-        {% for rated_game in rated_games %}
-        <p> {{rated_game}} </p>
-        {% endfor %}
-
-    <h1>We recommend the following games for {{user.username}}:</h1>
-        {% for rec in recommendations %}
-        <p> {{rec}} </p>
-        {% endfor %}
+{% block app_content %}
+    <h1>NintendoLife Recommender</h1>
+    {{ form.csrf_token }}
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
 {% endblock %}

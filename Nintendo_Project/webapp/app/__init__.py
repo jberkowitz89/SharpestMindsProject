@@ -13,7 +13,6 @@ from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config(['SQLALCHEMY_DATABASE_URI'] = "postgresql://josephberkowitz:@localhost:5432/nintendo")
 db = SQLAlchemy(app)
 bootstrap = Bootstrap(app)
 
