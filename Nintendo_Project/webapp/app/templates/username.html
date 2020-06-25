@@ -2,13 +2,11 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block app_content %}
-    <h1>Enter Your Games: </h1>
+    <h1>Enter Your NintendoLife Username: </h1>
     {{ form.csrf_token }}
     <div class="row">
         <div class="col-md-4">
-            <form autocomplete="off" method="post">
             {{ wtf.quick_form(form) }}
-            </form>
         </div>
     </div>
 {% endblock %}

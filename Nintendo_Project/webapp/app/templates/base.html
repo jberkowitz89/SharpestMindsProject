@@ -36,4 +36,30 @@
 
         {% block app_content %}{% endblock %}
     </div>
-{% endblock %}4
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <link href="//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+    $(document).ready(function(){
+    var games=[];
+
+    function loadGames(){
+            $.getJSON('/display_games', function(data, status, xhr){
+                    for (var i=0; i < data.length; i++ ) {
+                    games.push(data[i].game);
+            }
+    });
+    };
+
+    loadGames();
+    console.log(games);
+
+    $('#submit_games').autocomplete({
+            source: games,
+            });
+    });
+    </script>
+{% endblock %}
