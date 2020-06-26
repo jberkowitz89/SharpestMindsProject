@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block app_content %}
+    <h1>Your Recommendations</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <h3>Based on games you entered: </h3><br>
+            {% for game in games %}
+            <p>{{ game }}</p>
+            {% endfor %}
+            <h3>We recommend you play:</h3><br>
+            {% for rec in recs %}
+            <p>{{ rec }}</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

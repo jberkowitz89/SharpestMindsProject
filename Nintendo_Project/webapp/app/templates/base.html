@@ -57,9 +57,18 @@
     loadGames();
     console.log(games);
 
-    $('#submit_games').autocomplete({
+    $('#game_1').autocomplete({
             source: games,
             });
+
+    $('#game_2').autocomplete({
+            source: games,
+           });
+
+    $('#game_3').autocomplete({
+            source: games,
+            });
+
     });
     </script>
 {% endblock %}

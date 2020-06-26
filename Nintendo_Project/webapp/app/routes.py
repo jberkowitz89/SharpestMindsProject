@@ -8,8 +8,12 @@ Created on Mon Apr 20 07:41:11 2020
 
 from flask import render_template, flash, redirect, url_for, jsonify, session
 from app.forms import GamesForm, NL_User_Form, Username_Form
-from app.models import Clean_Data, Recommendations, Known_Items
+from app.models import Clean_Data, Recommendations, Known_Items, Tuning
 from app import app, db
+from ast import literal_eval
+import pandas as pd
+from app.utils import add_new_games, new_model, new_user_predictions
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -59,9 +63,27 @@ def submit_games():
             form.game_1.data, form.game_2.data, form.game_3.data))
         games = [form.game_1.data, form.game_2.data, form.game_3.data]
         session['games'] = games
-        return redirect(url_for('display_games'))
+        return redirect(url_for('new_user_recommendations'))
     return render_template("submit_games.html", title="Submit Games", form=form)
-3
+
+@app.route('/new_user_recommendations', methods=['GET', 'POST'])
+def new_user_recommendations():
+    games = session.get('games', None)
+    games_max_runtime = db.session.query(db.func.max(Clean_Data.run_time)).first()[0]
+    tuning_max_runtime = db.session.query(db.func.max(Tuning.run_time)).first()[0]
+    params = literal_eval(Tuning.query.filter_by(run_time=tuning_max_runtime, rank_test_rmse=1).with_entities(Tuning.params).first()[0])
+
+    all_games = Clean_Data.query.filter_by(run_time=games_max_runtime,).with_entities(Clean_Data.username,
+                                                                                     Clean_Data.game,
+                                                                                     Clean_Data.rating).all()
+    all_games_df = pd.DataFrame(all_games, columns=['user', 'game', 'rating'])
+
+    new_df = add_new_games(all_games_df, games)
+    model = new_model(new_df, (1,10), params)
+    recs = new_user_predictions(new_df, model)
+
+    return render_template("new_user_recommendations.html", title="New User Recommendations", games=games, recs=recs)
+
 @app.route('/display_games', methods=['GET', 'POST'])
 def display_games():
     query = db.session.query(Clean_Data.game).distinct()
