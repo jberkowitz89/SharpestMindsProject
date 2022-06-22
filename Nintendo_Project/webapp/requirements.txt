@@ -16,7 +16,7 @@ Mako==1.1.2
 MarkupSafe==1.1.1
 matplotlib==3.2.1
 ml-metrics==0.1.4
-numpy==1.16.2
+numpy==1.22.0
 pandas==0.24.2
 psycopg2==2.8.4
 pyparsing==2.4.7
