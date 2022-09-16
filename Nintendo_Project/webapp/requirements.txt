@@ -12,7 +12,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.3
 joblib==0.14.1
 kiwisolver==1.2.0
-Mako==1.1.2
+Mako==1.2.2
 MarkupSafe==1.1.1
 matplotlib==3.2.1
 ml-metrics==0.1.4
